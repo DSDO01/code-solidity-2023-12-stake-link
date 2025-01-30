@@ -1,0 +1,9 @@
+config:
+  framework: "hardhat" 
+  framework_version: "^2.11.2" 
+  node_version: "20" 
+  package_manager: "yarn"
+
+tasks:
+  install-dependencies:
+    - yarn install
