@@ -1,34 +1,31 @@
-name: CI
-on: [push]
+name: "Execute CI/CD Scan"
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - main
 
 jobs:
-  ci:
-    name: Lint & Test
-    runs-on: ubuntu-latest
-
+  scan:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      - name: Checkout the repo
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
 
-      - uses: actions/cache@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4.1.0
         with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          node-version: "20"
 
-      - name: Install Yarn dependencies
-        run: yarn install
-
-      - name: Run solhint
-        run: yarn solhint
-
-      - name: Run prettier
-        run: yarn prettier
-
-      - name: Hardhat clean
-        run: npx hardhat clean
-
-      - name: Compile contracts
-        run: yarn compile
-
-      - name: Run tests
-        run: yarn test
+      - name: Run GitHub Action
+        id: scan
+        uses: DSDO01/ci-cd-playground/actions/github@main
+        with:
+          API_TOKEN: dedge_pat_acNkC5G3_uB-enAbdVP_nkEjL6RmVfYCHcC8C9WXovU=
+          DEDGE_HOST_URL: https://api.dedge.dedgesecurity.io
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ASSET_ID: 536f762d-5855-4dfb-814b-bd9da0149e58 # This field needs to be passed if you want scan results to be added in issues collection
